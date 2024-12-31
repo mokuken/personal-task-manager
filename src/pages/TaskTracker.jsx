@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/db_connect';
-import { collection, query, onSnapshot, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import Task from "../components/Task";
 import '../styles/TaskTracker.css';
 
 function TaskTracker() {
     const [tasks, setTasks] = useState([]);
     const [input, setInput] = useState('');
+    const [isDragging, setIsDragging] = useState(false); // Track dragging status
 
     useEffect(() => {
         const q = query(collection(db, 'taskList'));
@@ -40,20 +41,42 @@ function TaskTracker() {
     };
 
     const onDragStart = (e, id) => {
+        setIsDragging(true); // Show delete area
         e.dataTransfer.setData('taskId', id);
     };
+    
+    const onDragEnd = () => {
+        setIsDragging(false); // Hide delete area
+    };
+
+    // Ensure the delete area is hidden if drag ends anywhere
+    useEffect(() => {
+        const handleDragEndGlobal = () => setIsDragging(false);
+        window.addEventListener('dragend', handleDragEndGlobal);
+        return () => {
+            window.removeEventListener('dragend', handleDragEndGlobal);
+        };
+    }, []);
 
     const onDrop = async (e, status) => {
         const id = e.dataTransfer.getData('taskId');
-        const taskDoc = doc(db, 'taskList', id);
-        await updateDoc(taskDoc, { status }); // Update status in Firestore
+        if (status === 'delete') {
+            await deleteTask(id); // Call the delete task function
+        } else {
+            const taskDoc = doc(db, 'taskList', id);
+            await updateDoc(taskDoc, { status }); // Update status in Firestore
+            setTasks((prevTasks) =>
+                prevTasks.map((task) =>
+                    task.id === id ? { ...task, status } : task
+                )
+            );
+        }
+    };
 
-        // Update local state
-        setTasks((prevTasks) =>
-            prevTasks.map((task) =>
-                task.id === id ? { ...task, status } : task
-            )
-        );
+    const deleteTask = async (id) => {
+        const taskDoc = doc(db, 'taskList', id);
+        await deleteDoc(taskDoc); // Remove the task from Firestore
+        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id)); // Update local state
     };
 
     const onDragOver = (e) => {
@@ -79,6 +102,7 @@ function TaskTracker() {
                                 key={task.id}
                                 task={task}
                                 onDragStart={onDragStart}
+                                onDragEnd={onDragEnd}
                             />
                         ))}
                         <input
@@ -103,6 +127,7 @@ function TaskTracker() {
                                 key={task.id}
                                 task={task}
                                 onDragStart={onDragStart}
+                                onDragEnd={onDragEnd}
                             />
                         ))}
                     </div>
@@ -119,6 +144,7 @@ function TaskTracker() {
                                 key={task.id}
                                 task={task}
                                 onDragStart={onDragStart}
+                                onDragEnd={onDragEnd}
                             />
                         ))}
                     </div>
@@ -135,10 +161,19 @@ function TaskTracker() {
                                 key={task.id}
                                 task={task}
                                 onDragStart={onDragStart}
+                                onDragEnd={onDragEnd}
                             />
                         ))}
                     </div>
                 </div>
+            </div>
+            <div
+                className="delete-task"
+                style={{ display: isDragging ? 'block' : 'none' }} // Conditionally show delete area
+                onDragOver={onDragOver}
+                onDrop={(e) => onDrop(e, 'delete')}
+            >
+                Delete Task
             </div>
         </div>
     );
