@@ -7,6 +7,7 @@ const Navigation = () => {
       <CustomLink to="/">Home</CustomLink>
       <CustomLink to="/TaskTracker">Task Tracker</CustomLink>
       <CustomLink to="/Calendar">Calendar</CustomLink>
+      <CustomLink to="/HabitTracker">Habit Tracker</CustomLink>
     </nav>
   );
 };
