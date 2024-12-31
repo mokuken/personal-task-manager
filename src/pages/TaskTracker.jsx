@@ -28,12 +28,19 @@ function TaskTracker() {
             <div className='task-group'>
                 <div className='task-group-container'>
                     <div className="task-group-header not-started">Not started</div>
-                    <div className="task-group-list not-started"></div>
+                    <div className="task-group-list not-started">
+                        {tasks.filter(task => task.status === 'Not started').map((task, index) => (
+                            <Task
+                            key={index}
+                            task={task}
+                            />
+                        ))}
+                    </div>
                 </div>
                 <div className='task-group-container'>
                     <div className="task-group-header in-progress">In progress</div>
                     <div className="task-group-list in-progress">
-                        {tasks.map((task, index) => (
+                        {tasks.filter(task => task.status === 'In progress').map((task, index) => (
                             <Task
                             key={index}
                             task={task}
@@ -43,11 +50,25 @@ function TaskTracker() {
                 </div>
                 <div className='task-group-container'>
                     <div className="task-group-header to-be-checked">To be checked</div>
-                    <div className="task-group-list to-be-checked"></div>
+                    <div className="task-group-list to-be-checked">
+                        {tasks.filter(task => task.status === 'To be checked').map((task, index) => (
+                            <Task
+                            key={index}
+                            task={task}
+                            />
+                        ))}
+                    </div>
                 </div>
                 <div className='task-group-container'>
                     <div className="task-group-header done">Done</div>
-                    <div className="task-group-list done"></div>
+                    <div className="task-group-list done">
+                        {tasks.filter(task => task.status === 'Done').map((task, index) => (
+                            <Task
+                            key={index}
+                            task={task}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
