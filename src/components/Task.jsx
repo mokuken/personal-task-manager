@@ -1,8 +1,14 @@
 import React from 'react';
 
-const Task = ({ task }) => {
+const Task = ({ task, onDragStart }) => {
   return (
-      <div className="task">{task.task}</div>
+    <div
+      className="task"
+      draggable
+      onDragStart={(e) => onDragStart(e, task.id)}
+    >
+      {task.task}
+    </div>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/db_connect';
-import { collection, query, onSnapshot, addDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, addDoc, updateDoc, doc } from 'firebase/firestore';
 import Task from "../components/Task";
 import '../styles/TaskTracker.css';
 
@@ -30,13 +30,34 @@ function TaskTracker() {
             task: input,
             status: "Not started",
         });
-        setInput(''); // Clear the input after creating the task
+        setInput('');
     };
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
-            createTask(e); // Call createTask when the "Enter" key is pressed
+            createTask(e);
         }
+    };
+
+    const onDragStart = (e, id) => {
+        e.dataTransfer.setData('taskId', id);
+    };
+
+    const onDrop = async (e, status) => {
+        const id = e.dataTransfer.getData('taskId');
+        const taskDoc = doc(db, 'taskList', id);
+        await updateDoc(taskDoc, { status }); // Update status in Firestore
+
+        // Update local state
+        setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+                task.id === id ? { ...task, status } : task
+            )
+        );
+    };
+
+    const onDragOver = (e) => {
+        e.preventDefault();
     };
 
     return (
@@ -46,55 +67,74 @@ function TaskTracker() {
             </div>
             <br />
             <div className='task-group'>
-                <div className='task-group-container'>
+                <div
+                    className='task-group-container'
+                    onDragOver={onDragOver}
+                    onDrop={(e) => onDrop(e, 'Not started')}
+                >
                     <div className="task-group-header not-started">Not started</div>
                     <div className="task-group-list not-started">
-                        {tasks.filter(task => task.status === 'Not started').map((task, index) => (
+                        {tasks.filter(task => task.status === 'Not started').map((task) => (
                             <Task
-                                key={index}
+                                key={task.id}
                                 task={task}
+                                onDragStart={onDragStart}
                             />
                         ))}
-
                         <input
                             className="new-task"
                             type="text"
                             placeholder="New task"
                             value={input}
-                            onChange={(e) => setInput(e.target.value)} // Update input state
-                            onKeyDown={handleKeyPress} // Handle "Enter" key
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyPress}
                         />
                     </div>
                 </div>
-                <div className='task-group-container'>
+                <div
+                    className='task-group-container'
+                    onDragOver={onDragOver}
+                    onDrop={(e) => onDrop(e, 'In progress')}
+                >
                     <div className="task-group-header in-progress">In progress</div>
                     <div className="task-group-list in-progress">
-                        {tasks.filter(task => task.status === 'In progress').map((task, index) => (
+                        {tasks.filter(task => task.status === 'In progress').map((task) => (
                             <Task
-                                key={index}
+                                key={task.id}
                                 task={task}
+                                onDragStart={onDragStart}
                             />
                         ))}
                     </div>
                 </div>
-                <div className='task-group-container'>
+                <div
+                    className='task-group-container'
+                    onDragOver={onDragOver}
+                    onDrop={(e) => onDrop(e, 'To be checked')}
+                >
                     <div className="task-group-header to-be-checked">To be checked</div>
                     <div className="task-group-list to-be-checked">
-                        {tasks.filter(task => task.status === 'To be checked').map((task, index) => (
+                        {tasks.filter(task => task.status === 'To be checked').map((task) => (
                             <Task
-                                key={index}
+                                key={task.id}
                                 task={task}
+                                onDragStart={onDragStart}
                             />
                         ))}
                     </div>
                 </div>
-                <div className='task-group-container'>
+                <div
+                    className='task-group-container'
+                    onDragOver={onDragOver}
+                    onDrop={(e) => onDrop(e, 'Done')}
+                >
                     <div className="task-group-header done">Done</div>
                     <div className="task-group-list done">
-                        {tasks.filter(task => task.status === 'Done').map((task, index) => (
+                        {tasks.filter(task => task.status === 'Done').map((task) => (
                             <Task
-                                key={index}
+                                key={task.id}
                                 task={task}
+                                onDragStart={onDragStart}
                             />
                         ))}
                     </div>
