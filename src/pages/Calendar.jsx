@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { db } from '../firebase/db_connect'; // Ensure correct Firebase configuration is used
+import { collection, query, onSnapshot } from 'firebase/firestore';
 import '../styles/Calendar.css';
 
 const Calendar = () => {
@@ -8,6 +10,22 @@ const Calendar = () => {
     ];
 
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [habits, setHabits] = useState([]);
+
+    // Fetch habits data once and set up a real-time listener
+    useEffect(() => {
+        const q = query(collection(db, 'habitList'));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const habitsData = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setHabits(habitsData);
+        });
+
+        // Cleanup listener on unmount
+        return () => unsubscribe();
+    }, []);
 
     const renderDays = () => {
         const year = currentDate.getFullYear();
@@ -26,23 +44,27 @@ const Calendar = () => {
 
         // Add the actual days
         for (let day = 1; day <= totalDays; day++) {
+            const currentDay = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
-            const habits = isToday ? ['Habit 1', 'Habit 2', 'Habit 3', 'Habit 4'] : []; // Example habits
 
-            const visibleHabits = habits.slice(0, 3); // Show only the first habit
-            const remainingCount = habits.length - visibleHabits.length;
+            // Filter habits for the current day
+            const dailyHabits = habits.filter(habit =>
+                habit.achieveDates && habit.achieveDates.includes(currentDay)
+            );
+
+            const visibleHabits = dailyHabits.slice(0, 3); // Show only the first 3 habits
+            const remainingCount = dailyHabits.length - visibleHabits.length;
 
             days.push(
                 <div key={day} className={`day ${isToday ? 'current-day' : ''}`}>
                     <strong>{day}</strong>
-                    {habits.length > 0 && (
+                    {dailyHabits.length > 0 && (
                         <ul className="habit-list">
                             {visibleHabits.map((habit, index) => (
-                                <li key={index}>{habit}</li>
+                                <li key={index}>{habit.habitName}</li>
                             ))}
                             {remainingCount > 0 && (
                                 <span className="more-task">
-                                    <li>{habits[1]}</li>
                                     <li className="number">+{remainingCount}</li>
                                 </span>
                             )}
