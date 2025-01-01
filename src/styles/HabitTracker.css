@@ -22,11 +22,103 @@
     padding: 10px 20px;
     margin: 10px 0;
     border-radius: 4px;
-    color: white
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.check-ins {
+    display: flex;
+    align-items: center;
+}
+
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 5px;
+    border: 1px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: bold;
+}
+
+.new-habit {
+    background-color: transparent;
+    padding: 15px 20px;
+    border-radius: 4px;
+    width: 100%;
+    border: 1px solid #222222;
+    color: #fff;
+    outline: none;
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 .habit-info {
     width: 60%;
     height: 100%;
+    padding: 10px 20px;
     border-left: 1px solid #222222;
+    display: flex;
+    flex-direction: column;
+}
+
+.habit-description {
+    background-color: #222222;
+    padding: 10px 20px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    height: 50%;
+}
+
+.habit-status {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+.div1, .div2, .div3, .div4 {
+    background-color: #222222;
+    padding: 10px 20px;
+    border-radius: 4px;
+}
+
+.div1 { 
+    grid-area: 1 / 1 / 3 / 3;
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+.div2 { 
+    grid-area: 1 / 3 / 3 / 5;
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+.div3 { 
+    grid-area: 3 / 1 / 5 / 3;
+    margin-top: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+.div4 {
+    grid-area: 3 / 3 / 5 / 5;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+.habit-logs {
+    background-color: #222222;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+    height: 50%;
 }
