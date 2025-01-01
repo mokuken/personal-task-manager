@@ -52,8 +52,9 @@ const Calendar = () => {
                 habit.achieveDates && habit.achieveDates.includes(currentDay)
             );
 
-            const visibleHabits = dailyHabits.slice(0, 3); // Show only the first 3 habits
-            const remainingCount = dailyHabits.length - visibleHabits.length;
+            const visibleHabits = dailyHabits.slice(0, 3); // Show only the first 2 habits
+            const lastHabit = dailyHabits[3] || { habitName: '' }; // Get the 3rd habit or empty object
+            const remainingCount = dailyHabits.length - 4;
 
             days.push(
                 <div key={day} className={`day ${isToday ? 'current-day' : ''}`}>
@@ -63,11 +64,10 @@ const Calendar = () => {
                             {visibleHabits.map((habit, index) => (
                                 <li key={index}>{habit.habitName}</li>
                             ))}
-                            {remainingCount > 0 && (
-                                <span className="more-task">
-                                    <li className="number">+{remainingCount}</li>
-                                </span>
-                            )}
+                            <span className='more-task'>
+                                <li>{lastHabit.habitName}</li>
+                                {dailyHabits.length > 4 && <li className="number">+{remainingCount}</li>}
+                            </span>
                         </ul>
                     )}
                 </div>
