@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { db } from '../firebase/db_connect';
 import { collection, query, onSnapshot, addDoc } from 'firebase/firestore';
-import Habit from "../components/Habit";
+import Habit from '../components/Habit';
 import '../styles/HabitTracker.css';
 
 function HabitTracker() {
@@ -17,9 +17,15 @@ function HabitTracker() {
                 habitArr.push({ id: doc.id, ...doc.data() });
             });
             setHabits(habitArr);
+
+            // Update selected habit if it's part of the updated habits
+            if (selectedHabit) {
+                const updatedHabit = habitArr.find((habit) => habit.id === selectedHabit.id);
+                setSelectedHabit(updatedHabit || null);
+            }
         });
         return () => unsubscribe();
-    }, []);
+    }, [selectedHabit]);
 
     const createHabit = async (e) => {
         e.preventDefault();
@@ -40,6 +46,27 @@ function HabitTracker() {
             createHabit(e);
         }
     };
+
+    // Get current month matches
+    const getCurrentMonthMatches = (achieveDates = []) => {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth(); // 0-indexed (January is 0)
+        const currentYear = currentDate.getFullYear();
+
+        return achieveDates.filter((dateString) => {
+            const date = new Date(dateString); // Parse the date string
+            return (
+                date.getMonth() === currentMonth && date.getFullYear() === currentYear
+            );
+        }).length;
+    };
+
+    // Memoize results for better performance
+    const currentMonthMatches = useMemo(() => {
+        return getCurrentMonthMatches(selectedHabit?.achieveDates || []);
+    }, [selectedHabit]);
+
+    const totalCheckIns = selectedHabit?.achieveDates?.length || 0;
 
     return (
         <div className='habit-container'>
@@ -73,11 +100,15 @@ function HabitTracker() {
                         <div className='habit-status'>
                             <div className='div1'>
                                 <h4>Monthly Check-ins</h4>
-                                <h2>0 Day</h2>
+                                <h2>
+                                    {currentMonthMatches} {currentMonthMatches === 1 ? 'Day' : 'Days'}
+                                </h2>
                             </div>
                             <div className='div2'>
                                 <h4>Total Check-ins</h4>
-                                <h2>{selectedHabit.achieveDates?.length || 0} Days</h2>
+                                <h2>
+                                    {totalCheckIns} {totalCheckIns === 1 ? 'Day' : 'Days'}
+                                </h2>
                             </div>
                             <div className='div3'>
                                 <h4>Monthly Check-in rate</h4>
