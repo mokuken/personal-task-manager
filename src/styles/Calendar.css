@@ -67,7 +67,7 @@ button:hover {
 }
 
 .days-grid div:hover {
-    background: #f0f0f0;
+    background: #191919;
 }
 
 .days-grid div.current-day {
@@ -80,7 +80,7 @@ button:hover {
 }
 
 .days-grid div strong {
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 .habit-list {
