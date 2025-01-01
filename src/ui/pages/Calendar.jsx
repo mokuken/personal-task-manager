@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase/db_connect'; // Ensure correct Firebase configuration is used
+import { db } from '../../firebase/db_connect'; // Ensure correct Firebase configuration is used
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import '../styles/Calendar.css';
 

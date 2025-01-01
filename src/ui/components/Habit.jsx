@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase/db_connect'; // Adjust the path as needed
+import { db } from '../../firebase/db_connect'; // Adjust the path as needed
 
 const Habit = ({ habit, onClick }) => {
     const getLast7Days = () => {

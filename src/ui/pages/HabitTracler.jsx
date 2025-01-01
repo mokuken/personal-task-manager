@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { db } from '../firebase/db_connect';
+import { db } from '../../firebase/db_connect';
 import { collection, query, onSnapshot, addDoc } from 'firebase/firestore';
 import Habit from '../components/Habit';
 import '../styles/HabitTracker.css';

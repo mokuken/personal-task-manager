@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { db } from '../firebase/db_connect';
+import { db } from '../../firebase/db_connect';
 import { collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import Task from "../components/Task";
 import '../styles/TaskTracker.css';
