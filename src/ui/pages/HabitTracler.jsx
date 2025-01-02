@@ -61,7 +61,40 @@ function HabitTracker() {
         }).length;
     };
 
-    // Memoize results for better performance
+    // Calculate streak
+    const calculateStreak = (achieveDates = []) => {
+        if (!achieveDates || achieveDates.length === 0) return 0;
+
+        // Sort dates in descending order
+        const sortedDates = achieveDates
+            .map((date) => new Date(date))
+            .sort((a, b) => b - a);
+
+        let streak = 0;
+        const currentDate = new Date();
+        let previousDate = currentDate;
+
+        for (let date of sortedDates) {
+            // Calculate the difference in days
+            const diffInDays = Math.ceil((previousDate - date) / (1000 * 60 * 60 * 24));
+            if (diffInDays === 1 || (streak === 0 && diffInDays === 0)) {
+                // Consecutive days or same day
+                streak++;
+                previousDate = date;
+            } else {
+                break; // Streak is broken
+            }
+        }
+
+        return streak;
+    };
+
+    // Memoize streak for performance
+    const streak = useMemo(() => {
+        return calculateStreak(selectedHabit?.achieveDates || []);
+    }, [selectedHabit]);
+
+    // Memoize current month matches
     const currentMonthMatches = useMemo(() => {
         return getCurrentMonthMatches(selectedHabit?.achieveDates || []);
     }, [selectedHabit]);
@@ -116,7 +149,7 @@ function HabitTracker() {
                             </div>
                             <div className='div4'>
                                 <h4>Streak</h4>
-                                <h2>0 Day</h2>
+                                <h2>{streak} {streak === 1 ? 'Day' : 'Days'}</h2>
                             </div>
                         </div>
                         <div className='habit-logs'>
