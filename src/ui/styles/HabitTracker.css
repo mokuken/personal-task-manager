@@ -27,6 +27,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border: 1px solid transparent; /* just to match the design on select */
+    cursor: pointer;
+}
+
+.habit.selected {
+    border: 1px solid #fff; /* Green border for selected habit */
 }
 
 .check-ins {

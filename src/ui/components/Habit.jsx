@@ -3,11 +3,11 @@ import dayjs from 'dayjs';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase/db_connect'; // Adjust the path as needed
 
-const Habit = ({ habit, onClick }) => {
+const Habit = ({ habit, onClick, isSelected }) => {
     const getLast7Days = () => {
         const days = [];
         for (let i = 6; i >= 0; i--) {
-            days.push(dayjs().subtract(i, 'day').format('YYYY-MM-DD')); // Format as YYYY-MM-DD
+            days.push(dayjs().subtract(i, 'day').format('YYYY-MM-DD'));
         }
         return days;
     };
@@ -16,15 +16,13 @@ const Habit = ({ habit, onClick }) => {
 
     const toggleCheckIn = async (date) => {
         try {
-            const habitRef = doc(db, 'habitList', habit.id); // Reference to the habit document
+            const habitRef = doc(db, 'habitList', habit.id);
             const updatedDates = habit.achieveDates || [];
 
             if (updatedDates.includes(date)) {
-                // Remove the date if already checked
                 const newDates = updatedDates.filter((d) => d !== date);
                 await updateDoc(habitRef, { achieveDates: newDates });
             } else {
-                // Add the date if not checked
                 updatedDates.push(date);
                 await updateDoc(habitRef, { achieveDates: updatedDates });
             }
@@ -35,12 +33,11 @@ const Habit = ({ habit, onClick }) => {
 
     return (
         <div
-            className="habit"
+            className={`habit ${isSelected ? 'selected' : ''}`} // Conditional class
             onClick={onClick}
-            style={{ cursor: 'pointer' }}
         >
             {habit.habitName}
-            <div className='check-ins'>
+            <div className="check-ins">
                 {last7Days.map((day, index) => (
                     <div
                         key={index}
@@ -50,7 +47,7 @@ const Habit = ({ habit, onClick }) => {
                             color: habit.achieveDates?.includes(day) ? 'black' : 'white',
                             cursor: 'pointer',
                         }}
-                        onClick={() => toggleCheckIn(day)} // Handle click
+                        onClick={() => toggleCheckIn(day)}
                     >
                         {habit.achieveDates?.includes(day) ? '✓' : ''}
                     </div>

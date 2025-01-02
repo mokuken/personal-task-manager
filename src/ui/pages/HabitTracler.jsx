@@ -111,6 +111,7 @@ function HabitTracker() {
                             key={habit.id}
                             habit={habit}
                             onClick={() => setSelectedHabit(habit)}
+                            isSelected={selectedHabit?.id === habit.id} // Pass selected state
                         />
                     ))}
                 </div>
