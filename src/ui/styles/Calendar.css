@@ -64,6 +64,7 @@ button:hover {
     flex-direction: column;
     padding: 10px;
     background-color: #1E1E1E;
+    border: 1px solid transparent;
 }
 
 .days-grid div:hover {
@@ -71,8 +72,7 @@ button:hover {
 }
 
 .days-grid div.current-day {
-    border: 3px solid #007bff;
-    box-shadow: 0 0 5px #007bff;
+    border: 1px solid #007bff;
 }
 
 .days-grid div.empty {
