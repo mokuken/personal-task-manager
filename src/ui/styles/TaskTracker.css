@@ -9,8 +9,8 @@
 }
 
 .task-group {
-    width: 80%;
-    height: 50%;
+    width: 90%;
+    height: 70%;
     display: flex;
 }
 
@@ -101,4 +101,38 @@ form {
     padding: 20px 80px;
     background-color: transparent;
     color: #752e2e;
+}
+
+.task-folder {
+    width: 100%;
+    background-color: black;
+    padding-top: 10px;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.folder {
+    background-color: #242424;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    width: 15%;
+    padding: 10px 20px;
+}
+
+.add-folder {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.selected {
+    background-color: #191919;
+}
+
+.no-folder-message {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
