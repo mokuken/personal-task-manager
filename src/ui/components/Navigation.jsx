@@ -4,7 +4,7 @@ import '../styles/Navigation.css';
 const Navigation = () => {
   return (
     <nav>
-      <CustomLink to="/">Home</CustomLink>
+      <CustomLink to="/">Dashboard</CustomLink>
       <CustomLink to="/TaskTracker">Task Tracker</CustomLink>
       <CustomLink to="/Calendar">Calendar</CustomLink>
       <CustomLink to="/HabitTracker">Habit Tracker</CustomLink>
