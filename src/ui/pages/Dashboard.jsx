@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Dashboard.css";
+import {
+    Chart as ChartJS,
+    LineElement,
+    PointElement,
+    Tooltip,
+    RadialLinearScale,
+    Filler
+} from "chart.js";
+import { Radar } from "react-chartjs-2";
+import { collection, query, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/db_connect";
+
+ChartJS.register(LineElement, PointElement, Tooltip, RadialLinearScale, Filler);
 
 function Dashboard() {
     const [elapsedTime, setElapsedTime] = useState({
@@ -10,6 +23,9 @@ function Dashboard() {
         minutes: 0,
         seconds: 0,
     });
+
+    const [chartData, setChartData] = useState([0, 0, 0, 0, 0]);
+    const labels = ["Strength", "Knowledge", "Health", "Work", "Money"];
 
     useEffect(() => {
         const birthDate = new Date(2003, 7, 3); // August 3, 2003
@@ -46,16 +62,63 @@ function Dashboard() {
             });
         };
 
-        // Calculate immediately on mount
         calculateElapsedTime();
-
-        // Update every second
         const interval = setInterval(calculateElapsedTime, 1000);
 
-        return () => clearInterval(interval); // Cleanup on unmount
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        const q = query(collection(db, "habitList"));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const typeCounts = labels.map((label) => {
+                let count = 0;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.type && data.type.includes(label)) {
+                        count += (data.achieveDates || []).length;
+                    }
+                });
+                return count;
+            });
+
+            setChartData(typeCounts);
+        });
+
+        return () => unsubscribe();
     }, []);
 
     const formatTwoDigits = (value) => value.toString().padStart(2, "0");
+
+    const data = {
+        labels,
+        datasets: [{
+            label: 'Points',
+            data: chartData,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderColor: 'rgba(255, 255, 255, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    const options = {
+        scales: {
+            r: {
+                grid: {
+                    color: 'grey',
+                },
+                ticks: {
+                    display: false,
+                },
+                pointLabels: {
+                    font: {
+                        size: 14, // Increase font size for better readability
+                    },
+                    padding: 15, // Add padding to increase the distance from the chart center
+                },
+            },
+        },
+    };
 
     return (
         <div className="dashboard-container">
@@ -95,7 +158,9 @@ function Dashboard() {
                 <h1>₱98,000</h1>
             </div>
             <div className="board4"></div>
-            <div className="board5"></div>
+            <div className="board5">
+                <Radar data={data} options={options}></Radar>
+            </div>
             <div className="board6"></div>
         </div>
     );
