@@ -131,8 +131,11 @@ form {
 }
 
 .no-folder-message {
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 100%;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #757575;
 }

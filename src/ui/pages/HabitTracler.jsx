@@ -159,7 +159,9 @@ function HabitTracker() {
                         </div>
                     </>
                 ) : (
-                    <p>Select a habit to see details</p>
+                    <div className='no-habit-selected'>
+                        <p>Select a habit to see details</p>
+                    </div>
                 )}
             </div>
         </div>

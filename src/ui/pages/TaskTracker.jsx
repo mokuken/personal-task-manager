@@ -221,7 +221,7 @@ function TaskTracker() {
                 </div>
             )} {!selectedFolder && (
                 <div className="no-folder-message">
-                    <h2>Select a Folder</h2>
+                    <p>Select a folder to see list of tasks</p>
                 </div>
             )}
 
