@@ -78,6 +78,15 @@ function TaskTracker() {
         setIsDragging(false);
     };
 
+    // Ensure the delete area is hidden if drag ends anywhere
+    useEffect(() => {
+        const handleDragEndGlobal = () => setIsDragging(false);
+        window.addEventListener('dragend', handleDragEndGlobal);
+        return () => {
+            window.removeEventListener('dragend', handleDragEndGlobal);
+        };
+    }, []);
+
     const onDrop = async (e, status) => {
         const id = e.dataTransfer.getData('taskId');
         if (status === 'delete') {
@@ -118,7 +127,7 @@ function TaskTracker() {
                 ))}
                 <div className='add-folder' onClick={createFolder}>+</div>
             </div>
-    
+
             {/* Conditionally render task groups if a folder is selected */}
             {selectedFolder && (
                 <div className='task-container'>
@@ -215,7 +224,7 @@ function TaskTracker() {
                     <h2>Select a Folder</h2>
                 </div>
             )}
-    
+
             {/* Delete task area */}
             <div
                 className="delete-task"
@@ -227,7 +236,7 @@ function TaskTracker() {
             </div>
         </div>
     );
-    
+
 }
 
 export default TaskTracker;
