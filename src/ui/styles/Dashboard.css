@@ -6,6 +6,7 @@
     grid-row-gap: 0px;
     height: 100%;
     padding: 10px;
+    overflow: hidden;
 }
 
 .board1, .board2, .board3, .board4, .board5, .board6 {
@@ -66,3 +67,43 @@
 .time-container div p {
     font-size: 0.8rem;
 }
+  
+  .board1, .board2, .board3, .board4, .board5, .board6 {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideIn 0.6s forwards;
+  }
+  
+  /* Keyframe for the slideIn animation */
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Delay the animations for each board using classes */
+  .board1 {
+    animation-delay: 0.1s;
+  }
+  
+  .board2 {
+    animation-delay: 0.2s;
+  }
+  
+  .board3 {
+    animation-delay: 0.3s;
+  }
+  
+  .board4 {
+    animation-delay: 0.4s;
+  }
+  
+  .board5 {
+    animation-delay: 0.5s;
+  }
+  
+  .board6 {
+    animation-delay: 0.6s;
+  }
+  
