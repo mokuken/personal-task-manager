@@ -72,6 +72,7 @@ function HabitTracker() {
 
         let streak = 0;
         const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() - 1); // Start from yesterday
         let previousDate = currentDate;
 
         for (let date of sortedDates) {
