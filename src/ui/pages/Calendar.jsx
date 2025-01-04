@@ -87,11 +87,11 @@ const Calendar = () => {
         <div className="calendar">
             {/* Calendar Header */}
             <div className="calendar-header">
-                <button className="prev-month" onClick={() => changeMonth(-1)}>&lt;</button>
+                <button className="prev-month" onClick={() => changeMonth(-1)}> ◄ </button>
                 <h2 className="month-year">
                     {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
                 </h2>
-                <button className="next-month" onClick={() => changeMonth(1)}>&gt;</button>
+                <button className="next-month" onClick={() => changeMonth(1)}> ► </button>
             </div>
 
             {/* Weekdays Header */}
