@@ -8,6 +8,7 @@ const Navigation = () => {
       <CustomLink to="/TaskTracker">Task Tracker</CustomLink>
       <CustomLink to="/Calendar">Calendar</CustomLink>
       <CustomLink to="/HabitTracker">Habit Tracker</CustomLink>
+      <CustomLink to="/Finance">Finance</CustomLink>
     </nav>
   );
 };

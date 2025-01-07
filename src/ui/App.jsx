@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Calendar from './pages/Calendar';
 import TaskTracker from './pages/TaskTracker';
 import HabitTracker from './pages/HabitTracler';
+import Finance from './pages/Finance';
 import './App.css'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                 <Route path='/TaskTracker' element={<TaskTracker />} />
                 <Route path='/Calendar' element={<Calendar />} />
                 <Route path='/HabitTracker' element={<HabitTracker />} />
+                <Route path='/Finance' element={<Finance />} />
           </Routes>
         </main>
     </>
