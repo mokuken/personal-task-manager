@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/db_connect';
 import { collection, query, onSnapshot } from 'firebase/firestore';
+import { Line } from 'react-chartjs-2'; // Import Line chart
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Tooltip
+} from 'chart.js';
 import '../styles/Finance.css';
+
+// Register chart components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip);
 
 const Finance = () => {
     const [transactions, setTransactions] = useState([]);
     const [totalSavings, setTotalSavings] = useState(0);
-    const [totalWallet, setTotalWallet] = useState(0); // New state for wallet balance
-    const [currentCard, setCurrentCard] = useState('wallet'); // State to track the displayed card
+    const [totalWallet, setTotalWallet] = useState(0);
+    const [currentCard, setCurrentCard] = useState('wallet');
 
     useEffect(() => {
         const q = query(collection(db, 'finance'));
@@ -16,6 +28,10 @@ const Finance = () => {
                 id: doc.id,
                 ...doc.data(),
             }));
+
+            // Sort transactions by date (ascending)
+            transactionsData.sort((a, b) => a.date.seconds - b.date.seconds);
+
             setTransactions(transactionsData);
         });
 
@@ -23,7 +39,6 @@ const Finance = () => {
     }, []);
 
     useEffect(() => {
-        // Calculate total savings
         const savingsTotal = transactions
             .filter((transaction) => transaction.category === 'savings')
             .reduce((total, transaction) => {
@@ -34,7 +49,6 @@ const Finance = () => {
 
         setTotalSavings(savingsTotal);
 
-        // Calculate wallet balance
         const totalIncome = transactions
             .filter((transaction) => transaction.category === 'income')
             .reduce((total, transaction) => total + transaction.amount, 0);
@@ -76,6 +90,60 @@ const Finance = () => {
         }
     };
 
+    const generateChartData = () => {
+        // Extract all unique dates and sort them in ascending order
+        const uniqueDates = [...new Set(transactions.map((t) =>
+            new Date(t.date.seconds * 1000).toLocaleDateString()
+        ))].sort((a, b) => new Date(a) - new Date(b));
+
+        // Initialize datasets for income and expenses
+        const incomeData = uniqueDates.map((date) => {
+            const transaction = transactions.find(
+                (t) => new Date(t.date.seconds * 1000).toLocaleDateString() === date && t.category === 'income'
+            );
+            return transaction ? transaction.amount : 0;
+        });
+
+        const expensesData = uniqueDates.map((date) => {
+            const transaction = transactions.find(
+                (t) => new Date(t.date.seconds * 1000).toLocaleDateString() === date && t.category === 'expenses'
+            );
+            return transaction ? transaction.amount : 0;
+        });
+
+        return {
+            labels: uniqueDates,
+            datasets: [
+                {
+                    label: 'Total Income',
+                    data: incomeData,
+                    borderColor: '#609c52',
+                    backgroundColor: 'rgba(96, 156, 82, 0.2)',
+                    tension: 0.3
+                },
+                {
+                    label: 'Total Expenses',
+                    data: expensesData,
+                    borderColor: '#cc473d',
+                    backgroundColor: 'rgba(204, 71, 61, 0.2)',
+                    tension: 0.3,
+                },
+            ],
+        };
+    };
+
+
+    const chartOptions = {
+        responsive: true, // Ensures the chart adjusts to container size
+        maintainAspectRatio: false, // Allows custom height/width
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+        },
+    };
+
+
     return (
         <div className="finance-container">
             <div className="balance">
@@ -90,9 +158,13 @@ const Finance = () => {
                     {renderCardContent()}
                 </div>
             </div>
-            <div className="report"></div>
+            <div className="report">
+                <div style={{ height: '100%' }}> {/* Set a custom height for the chart */}
+                    <Line data={generateChartData()} options={chartOptions} />
+                </div>
+            </div>
             <div className="history">
-                <h2>Transaction</h2>
+                <div className='history-data'>
                 <table>
                     <thead>
                         <tr>
@@ -104,9 +176,9 @@ const Finance = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {transactions.map((transaction, index) => (
+                        {[...transactions].reverse().map((transaction, index) => (
                             <tr key={transaction.id}>
-                                <td>{index + 1}</td>
+                                <td>{index + 1}</td> {/* This ensures numbering starts from 1 at the top */}
                                 <td>{new Date(transaction.date.seconds * 1000).toLocaleDateString()}</td>
                                 <td>{transaction.category}</td>
                                 <td>{transaction.type}</td>
@@ -120,6 +192,7 @@ const Finance = () => {
                         ))}
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     );
