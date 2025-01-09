@@ -88,7 +88,9 @@ const TransactionHistory = ({ transactions, onAddTransaction }) => {
                                 <select name="category" value={formData.category} onChange={handleInputChange}>
                                     <option value="income">Income</option>
                                     <option value="expenses">Expenses</option>
-                                    <option value="savings">Savings</option>
+                                    <option value="deposit/savings">Deposit to Savings</option>
+                                    <option value="withdraw/savings">Withdraw from Savings</option>
+                                    <option value="none">None</option>
                                 </select>
                             </div>
                             <div>
