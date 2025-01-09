@@ -53,24 +53,31 @@ const Finance = () => {
 
     useEffect(() => {
         const savingsTotal = transactions
-            .filter((transaction) => transaction.category === 'savings')
+            .filter((transaction) => 
+                transaction.category === 'withdraw/savings' || 
+                transaction.category === 'deposit/savings'
+            )
             .reduce((total, transaction) => {
-                return transaction.type === 'deposit'
+                return transaction.category === 'deposit/savings'
                     ? total + transaction.amount
                     : total - transaction.amount;
             }, 0);
-
+    
         setTotalSavings(savingsTotal);
-
+    
         const totalIncome = transactions
             .filter((transaction) => transaction.category === 'income')
             .reduce((total, transaction) => total + transaction.amount, 0);
-
+    
         const totalExpenses = transactions
             .filter((transaction) => transaction.category === 'expenses')
             .reduce((total, transaction) => total + transaction.amount, 0);
-
-        setTotalWallet(totalIncome - totalExpenses);
+    
+        const totalNone = transactions
+            .filter((transaction) => transaction.category === 'none')
+            .reduce((total, transaction) => total + transaction.amount, 0);
+    
+        setTotalWallet(totalIncome - totalExpenses + totalNone);
     }, [transactions]);
 
     const handleSwitch = () => {
