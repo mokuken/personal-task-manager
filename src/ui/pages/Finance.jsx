@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/db_connect';
-import { collection, query, onSnapshot } from 'firebase/firestore';
+import { collection, query, onSnapshot, addDoc, Timestamp } from 'firebase/firestore';
 import { Line } from 'react-chartjs-2'; // Import Line chart
 import {
     Chart as ChartJS,
@@ -11,6 +11,8 @@ import {
     Tooltip
 } from 'chart.js';
 import '../styles/Finance.css';
+
+import TransactionHistory from '../components/TransactionHistory';
 
 // Register chart components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip);
@@ -37,6 +39,17 @@ const Finance = () => {
 
         return () => unsubscribe();
     }, []);
+
+    const handleAddTransaction = async (newTransaction) => {
+        try {
+            await addDoc(collection(db, 'finance'), {
+                ...newTransaction,
+                date: Timestamp.fromDate(newTransaction.date),
+            });
+        } catch (error) {
+            console.error('Error adding transaction: ', error);
+        }
+    };
 
     useEffect(() => {
         const savingsTotal = transactions
@@ -90,12 +103,26 @@ const Finance = () => {
         }
     };
 
+    ChartJS.defaults.animation = false; // disables all animations
+    ChartJS.defaults.animations.colors = false; // disables animation defined by the collection of 'colors' properties
+    ChartJS.defaults.animations.x = false; // disables animation defined by the 'x' property
+    ChartJS.defaults.transitions.active.animation.duration = 0; // disables the animation for 'active' mode
+
     const generateChartData = () => {
         // Extract all unique dates and sort them in ascending order
         const uniqueDates = [...new Set(transactions.map((t) =>
             new Date(t.date.seconds * 1000).toLocaleDateString()
         ))].sort((a, b) => new Date(a) - new Date(b));
-
+    
+        // Get current date in the same format
+        const currentDate = new Date().toLocaleDateString();
+    
+        // If current date is not in the dataset, add it with default values (0)
+        if (!uniqueDates.includes(currentDate)) {
+            uniqueDates.push(currentDate);
+            uniqueDates.sort((a, b) => new Date(a) - new Date(b));
+        }
+    
         // Initialize datasets for income and expenses
         const incomeData = uniqueDates.map((date) => {
             const transaction = transactions.find(
@@ -103,14 +130,14 @@ const Finance = () => {
             );
             return transaction ? transaction.amount : 0;
         });
-
+    
         const expensesData = uniqueDates.map((date) => {
             const transaction = transactions.find(
                 (t) => new Date(t.date.seconds * 1000).toLocaleDateString() === date && t.category === 'expenses'
             );
             return transaction ? transaction.amount : 0;
         });
-
+    
         return {
             labels: uniqueDates,
             datasets: [
@@ -121,13 +148,19 @@ const Finance = () => {
                     backgroundColor: (context) => {
                         const chart = context.chart;
                         const { ctx, chartArea } = chart;
+                    
+                        // If chartArea is not defined, return a transparent color
+                        if (!chartArea) {
+                            return 'rgba(0, 0, 0, 0)';
+                        }
+                    
                         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
                         gradient.addColorStop(0, 'rgba(96, 156, 82, 0)');
                         gradient.addColorStop(1, 'rgba(96, 156, 82, 0.2)');
                         return gradient;
                     },
-                    tension: 0.3,
-                    fill: true
+                    fill: true,
+                    tension: 0.5
                 },
                 {
                     label: 'Expenses',
@@ -136,17 +169,24 @@ const Finance = () => {
                     backgroundColor: (context) => {
                         const chart = context.chart;
                         const { ctx, chartArea } = chart;
+                    
+                        // If chartArea is not defined, return a transparent color
+                        if (!chartArea) {
+                            return 'rgba(0, 0, 0, 0)';
+                        }
+                    
                         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
                         gradient.addColorStop(0, 'rgba(204, 71, 61, 0)');
                         gradient.addColorStop(1, 'rgba(204, 71, 61, 0.2)');
                         return gradient;
                     },
-                    tension: 0.3,
-                    fill: true
+                    fill: true,
+                    tension: 0.5
                 },
             ],
         };
     };
+
 
 
     const chartOptions = {
@@ -197,49 +237,7 @@ const Finance = () => {
                 </div>
             </div>
             <div className="history">
-                <div className='history-data'>
-                    <div className="history-header">
-                        <h2>Transaction History</h2>
-                        <button>+</button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style={{ width: '40%' }}>Transaction Name</th>
-                                <th style={{ width: '30%', textAlign: 'center' }}>Category</th>
-                                <th style={{ width: '30%' }}>Amount</th>
-                            </tr>
-                        </thead>
-                    </table>
-                    <div className='data'>
-                        <table>
-                            <tbody>
-                                {[...transactions].reverse().map((transaction) => (
-                                    <tr key={transaction.id}>
-                                        <td style={{ width: '40%' }}>
-                                            <div>
-                                                <h3>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}</h3>
-                                                <p>
-                                                    {new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(transaction.date.seconds * 1000))} at {new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(new Date(transaction.date.seconds * 1000))}
-                                                </p>
-                                            </div>
-                                        </td>
-                                        <td style={{ width: '30%', textAlign: 'center' }}>{transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1)}</td>
-                                        <td style={{ width: '30%', color: transaction.type === 'withdraw' || transaction.category === 'expenses' ? '#cc473d' : '#609c52' }}>
-                                            <h3>
-                                                {transaction.type === 'withdraw' || transaction.category === 'expenses' ? '- ' : ''}
-                                                ₱
-                                                <span className="amount">
-                                                    {new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(transaction.amount)}
-                                                </span>
-                                            </h3>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <TransactionHistory transactions={transactions} onAddTransaction={handleAddTransaction} />
             </div>
         </div>
     );
