@@ -161,6 +161,19 @@ const Finance = () => {
             intersect: false,
             mode: 'index',
         },
+        scales: {
+            y: {
+                display: false,
+                grid: {
+                    color: '#fff', // Change y-axis grid line color to dark gray
+                },
+            },
+            x: {
+                grid: {
+                    color: '#444444', // Change y-axis grid line color to dark gray
+                },
+            }
+        },
     };
 
 
