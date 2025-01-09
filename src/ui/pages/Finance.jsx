@@ -115,18 +115,34 @@ const Finance = () => {
             labels: uniqueDates,
             datasets: [
                 {
-                    label: 'Total Income',
+                    label: 'Income',
                     data: incomeData,
                     borderColor: '#609c52',
-                    backgroundColor: 'rgba(96, 156, 82, 0.2)',
-                    tension: 0.3
+                    backgroundColor: (context) => {
+                        const chart = context.chart;
+                        const { ctx, chartArea } = chart;
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(96, 156, 82, 0)');
+                        gradient.addColorStop(1, 'rgba(96, 156, 82, 0.2)');
+                        return gradient;
+                    },
+                    tension: 0.3,
+                    fill: true
                 },
                 {
-                    label: 'Total Expenses',
+                    label: 'Expenses',
                     data: expensesData,
                     borderColor: '#cc473d',
-                    backgroundColor: 'rgba(204, 71, 61, 0.2)',
+                    backgroundColor: (context) => {
+                        const chart = context.chart;
+                        const { ctx, chartArea } = chart;
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(204, 71, 61, 0)');
+                        gradient.addColorStop(1, 'rgba(204, 71, 61, 0.2)');
+                        return gradient;
+                    },
                     tension: 0.3,
+                    fill: true
                 },
             ],
         };
@@ -140,6 +156,10 @@ const Finance = () => {
             legend: {
                 position: 'top',
             },
+        },
+        interaction: {
+            intersect: false,
+            mode: 'index',
         },
     };
 
@@ -165,33 +185,47 @@ const Finance = () => {
             </div>
             <div className="history">
                 <div className='history-data'>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Date</th>
-                            <th>Category</th>
-                            <th>Type</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {[...transactions].reverse().map((transaction, index) => (
-                            <tr key={transaction.id}>
-                                <td>{index + 1}</td> {/* This ensures numbering starts from 1 at the top */}
-                                <td>{new Date(transaction.date.seconds * 1000).toLocaleDateString()}</td>
-                                <td>{transaction.category}</td>
-                                <td>{transaction.type}</td>
-                                <td style={{ color: transaction.type === 'withdraw' || transaction.category === 'expenses' ? '#cc473d' : '#609c52' }}>
-                                    ₱
-                                    <span className="amount">
-                                        {new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(transaction.amount)}
-                                    </span>
-                                </td>
+                    <div className="history-header">
+                        <h2>Transaction History</h2>
+                        <button>+</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style={{ width: '40%' }}>Transaction Name</th>
+                                <th style={{ width: '30%', textAlign: 'center' }}>Category</th>
+                                <th style={{ width: '30%' }}>Amount</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                    </table>
+                    <div className='data'>
+                        <table>
+                            <tbody>
+                                {[...transactions].reverse().map((transaction) => (
+                                    <tr key={transaction.id}>
+                                        <td style={{ width: '40%' }}>
+                                            <div>
+                                                <h3>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}</h3>
+                                                <p>
+                                                    {new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(transaction.date.seconds * 1000))} at {new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(new Date(transaction.date.seconds * 1000))}
+                                                </p>
+                                            </div>
+                                        </td>
+                                        <td style={{ width: '30%', textAlign: 'center' }}>{transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1)}</td>
+                                        <td style={{ width: '30%', color: transaction.type === 'withdraw' || transaction.category === 'expenses' ? '#cc473d' : '#609c52' }}>
+                                            <h3>
+                                                {transaction.type === 'withdraw' || transaction.category === 'expenses' ? '- ' : ''}
+                                                ₱
+                                                <span className="amount">
+                                                    {new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(transaction.amount)}
+                                                </span>
+                                            </h3>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
