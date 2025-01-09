@@ -120,6 +120,37 @@
     margin-bottom: 10px;
 }
 
+.streak {
+    background-image: url('../assets/gif/flame.gif');
+    background-size: cover;
+    background-position: center;
+    background-size: 110%;
+}
+
+.white-streak {
+    background-image: url('../assets/gif/flame.gif');
+    background-size: cover;
+    background-position: center;
+    background-size: 110%;
+    filter: contrast(1.2) brightness(0.9) hue-rotate(170deg) saturate(0) grayscale(100%);
+}
+
+.blue-streak {
+    background-image: url('../assets/gif/flame.gif');
+    background-size: cover;
+    background-position: center;
+    background-size: 110%;
+    filter: contrast(1.2) brightness(0.9) hue-rotate(170deg) saturate(2);
+}
+
+.violet-streak {
+    background-image: url('../assets/gif/flame.gif');
+    background-size: cover;
+    background-position: center;
+    background-size: 110%;
+    filter: contrast(1.2) brightness(0.9) hue-rotate(270deg) saturate(2);
+}
+
 .habit-logs {
     background-color: #222222;
     padding: 10px 20px;

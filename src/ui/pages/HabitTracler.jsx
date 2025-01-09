@@ -149,7 +149,7 @@ function HabitTracker() {
                                 <h4>Monthly Check-in rate</h4>
                                 <h2>0%</h2>
                             </div>
-                            <div className='div4'>
+                            <div className={`div4 ${streak >= 28 ? 'violet-streak' : streak >= 21 ? 'blue-streak' : streak >= 14 ? 'white-streak' : streak >= 7 ? 'streak' : ''}`}>
                                 <h4>Streak</h4>
                                 <h2>{streak} {streak === 1 ? 'Day' : 'Days'}</h2>
                             </div>
