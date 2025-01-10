@@ -116,34 +116,31 @@ const Finance = () => {
     ChartJS.defaults.transitions.active.animation.duration = 0; // disables the animation for 'active' mode
 
     const generateChartData = () => {
-        // Extract all unique dates and sort them in ascending order
-        const uniqueDates = [...new Set(transactions.map((t) =>
-            new Date(t.date.seconds * 1000).toLocaleDateString()
-        ))].sort((a, b) => new Date(a) - new Date(b));
+        // Create an object to store totals grouped by date
+        const totalsByDate = {};
     
-        // Get current date in the same format
-        const currentDate = new Date().toLocaleDateString();
+        transactions.forEach((transaction) => {
+            const dateKey = new Date(transaction.date.seconds * 1000).toLocaleDateString();
+            
+            // Initialize the date key if it doesn't exist
+            if (!totalsByDate[dateKey]) {
+                totalsByDate[dateKey] = { income: 0, expenses: 0 };
+            }
     
-        // If current date is not in the dataset, add it with default values (0)
-        if (!uniqueDates.includes(currentDate)) {
-            uniqueDates.push(currentDate);
-            uniqueDates.sort((a, b) => new Date(a) - new Date(b));
-        }
-    
-        // Initialize datasets for income and expenses
-        const incomeData = uniqueDates.map((date) => {
-            const transaction = transactions.find(
-                (t) => new Date(t.date.seconds * 1000).toLocaleDateString() === date && t.category === 'income'
-            );
-            return transaction ? transaction.amount : 0;
+            // Add the transaction amount to the appropriate category
+            if (transaction.category === 'income') {
+                totalsByDate[dateKey].income += transaction.amount;
+            } else if (transaction.category === 'expenses') {
+                totalsByDate[dateKey].expenses += transaction.amount;
+            }
         });
     
-        const expensesData = uniqueDates.map((date) => {
-            const transaction = transactions.find(
-                (t) => new Date(t.date.seconds * 1000).toLocaleDateString() === date && t.category === 'expenses'
-            );
-            return transaction ? transaction.amount : 0;
-        });
+        // Get sorted unique dates
+        const uniqueDates = Object.keys(totalsByDate).sort((a, b) => new Date(a) - new Date(b));
+    
+        // Generate data for the chart
+        const incomeData = uniqueDates.map((date) => totalsByDate[date].income);
+        const expensesData = uniqueDates.map((date) => totalsByDate[date].expenses);
     
         return {
             labels: uniqueDates,
@@ -155,19 +152,16 @@ const Finance = () => {
                     backgroundColor: (context) => {
                         const chart = context.chart;
                         const { ctx, chartArea } = chart;
-                    
-                        // If chartArea is not defined, return a transparent color
                         if (!chartArea) {
                             return 'rgba(0, 0, 0, 0)';
                         }
-                    
                         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
                         gradient.addColorStop(0, 'rgba(96, 156, 82, 0)');
                         gradient.addColorStop(1, 'rgba(96, 156, 82, 0.2)');
                         return gradient;
                     },
                     fill: true,
-                    tension: 0.5
+                    tension: 0.5,
                 },
                 {
                     label: 'Expenses',
@@ -176,25 +170,20 @@ const Finance = () => {
                     backgroundColor: (context) => {
                         const chart = context.chart;
                         const { ctx, chartArea } = chart;
-                    
-                        // If chartArea is not defined, return a transparent color
                         if (!chartArea) {
                             return 'rgba(0, 0, 0, 0)';
                         }
-                    
                         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
                         gradient.addColorStop(0, 'rgba(204, 71, 61, 0)');
                         gradient.addColorStop(1, 'rgba(204, 71, 61, 0.2)');
                         return gradient;
                     },
                     fill: true,
-                    tension: 0.5
+                    tension: 0.5,
                 },
             ],
         };
     };
-
-
 
     const chartOptions = {
         responsive: true, // Ensures the chart adjusts to container size
