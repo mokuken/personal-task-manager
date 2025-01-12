@@ -25,7 +25,7 @@ function Dashboard() {
     });
 
     const [chartData, setChartData] = useState([0, 0, 0, 0, 0]);
-    const labels = ["Strength", "Knowledge", "Health", "Work", "Money"];
+    const labels = ["STR", "INT", "HLT", "WRK", "MNY"];
 
     useEffect(() => {
         const birthDate = new Date(2003, 7, 3); // August 3, 2003
