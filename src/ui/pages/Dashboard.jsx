@@ -25,7 +25,7 @@ function Dashboard() {
     });
 
     const [chartData, setChartData] = useState([0, 0, 0, 0, 0]);
-    const labels = ["STR", "INT", "HLT", "WRK", "MNY"];
+    const labels = ["STR", "INT", "HLT", "WRK", "INC"];
 
     useEffect(() => {
         const birthDate = new Date(2003, 7, 3); // August 3, 2003
@@ -90,16 +90,19 @@ function Dashboard() {
         });
     
         const unsubscribeFinance = onSnapshot(qFinance, (querySnapshot) => {
-            let incomeCount = 0;
+            let totalIncomeAmount = 0;
+        
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
-                if (data.category === "income") {
-                    incomeCount += 1;
+                if (data.category === "income" && typeof data.amount === "number") {
+                    totalIncomeAmount += data.amount;
                 }
             });
-    
+        
+            const incomeValue = totalIncomeAmount / 1000; // Divide total by 1000
+        
             setChartData((prevData) => {
-                return [...prevData.slice(0, 4), incomeCount]; // Update MNY with count
+                return [...prevData.slice(0, 4), incomeValue]; // Update MNY with calculated value
             });
         });
     
@@ -108,7 +111,6 @@ function Dashboard() {
             unsubscribeFinance();
         };
     }, []);
-    
 
     const formatTwoDigits = (value) => value.toString().padStart(2, "0");
 
