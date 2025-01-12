@@ -69,8 +69,10 @@ function Dashboard() {
     }, []);
 
     useEffect(() => {
-        const q = query(collection(db, "habitList"));
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const qHabit = query(collection(db, "habitList"));
+        const qFinance = query(collection(db, "finance"));
+    
+        const unsubscribeHabit = onSnapshot(qHabit, (querySnapshot) => {
             const typeCounts = labels.map((label) => {
                 let count = 0;
                 querySnapshot.forEach((doc) => {
@@ -81,12 +83,32 @@ function Dashboard() {
                 });
                 return count;
             });
-
-            setChartData(typeCounts);
+    
+            setChartData((prevData) => {
+                return [...typeCounts.slice(0, 4), prevData[4]]; // Keep old MNY value for now
+            });
         });
-
-        return () => unsubscribe();
+    
+        const unsubscribeFinance = onSnapshot(qFinance, (querySnapshot) => {
+            let incomeCount = 0;
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.category === "income") {
+                    incomeCount += 1;
+                }
+            });
+    
+            setChartData((prevData) => {
+                return [...prevData.slice(0, 4), incomeCount]; // Update MNY with count
+            });
+        });
+    
+        return () => {
+            unsubscribeHabit();
+            unsubscribeFinance();
+        };
     }, []);
+    
 
     const formatTwoDigits = (value) => value.toString().padStart(2, "0");
 
@@ -95,7 +117,7 @@ function Dashboard() {
         datasets: [{
             label: 'Points',
             data: chartData,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
             borderColor: 'rgba(255, 255, 255, 1)',
             borderWidth: 1
         }]
@@ -105,7 +127,10 @@ function Dashboard() {
         scales: {
             r: {
                 grid: {
-                    color: 'grey',
+                    color: 'rgba(128, 128, 128, 0.3)',
+                },
+                angleLines: {
+                    color: 'rgba(128, 128, 128, 0.3)',
                 },
                 ticks: {
                     display: false,
