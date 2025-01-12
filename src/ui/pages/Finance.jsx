@@ -121,7 +121,7 @@ const Finance = () => {
     
         transactions.forEach((transaction) => {
             const dateKey = new Date(transaction.date.seconds * 1000).toLocaleDateString();
-            
+    
             // Initialize the date key if it doesn't exist
             if (!totalsByDate[dateKey]) {
                 totalsByDate[dateKey] = { income: 0, expenses: 0 };
@@ -134,6 +134,14 @@ const Finance = () => {
                 totalsByDate[dateKey].expenses += transaction.amount;
             }
         });
+    
+        // Get the current date in the same format as the keys
+        const currentDateKey = new Date().toLocaleDateString();
+    
+        // Ensure the current date is included, even if there's no data
+        if (!totalsByDate[currentDateKey]) {
+            totalsByDate[currentDateKey] = { income: 0, expenses: 0 };
+        }
     
         // Get sorted unique dates
         const uniqueDates = Object.keys(totalsByDate).sort((a, b) => new Date(a) - new Date(b));
