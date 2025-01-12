@@ -4,7 +4,7 @@ import { collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from
 import Task from "../components/Task";
 import '../styles/TaskTracker.css';
 
-function TaskTracker() {
+function Kanban() {
     const [tasks, setTasks] = useState([]);
     const [folders, setFolders] = useState([]);
     const [selectedFolder, setSelectedFolder] = useState(''); // Track selected folder
@@ -239,4 +239,4 @@ function TaskTracker() {
 
 }
 
-export default TaskTracker;
+export default Kanban;

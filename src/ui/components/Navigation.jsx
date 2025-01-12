@@ -5,7 +5,7 @@ const Navigation = () => {
   return (
     <nav>
       <CustomLink to="/">Dashboard</CustomLink>
-      <CustomLink to="/TaskTracker">Task Tracker</CustomLink>
+      <CustomLink to="/Kanban">Kanban Board</CustomLink>
       <CustomLink to="/Calendar">Calendar</CustomLink>
       <CustomLink to="/HabitTracker">Habit Tracker</CustomLink>
       <CustomLink to="/Finance">Finance</CustomLink>
