@@ -9,7 +9,7 @@ import {
     Filler
 } from "chart.js";
 import { Radar } from "react-chartjs-2";
-import { collection, query, onSnapshot } from "firebase/firestore";
+import { collection, query, onSnapshot, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../firebase/db_connect";
 
 ChartJS.register(LineElement, PointElement, Tooltip, RadialLinearScale, Filler);
@@ -25,6 +25,10 @@ function Dashboard() {
     });
 
     const [chartData, setChartData] = useState([0, 0, 0, 0, 0]);
+    const [transactions, setTransactions] = useState([]);
+    const [totalSavings, setTotalSavings] = useState(0);
+    const [totalWallet, setTotalWallet] = useState(0);
+    const [currentCard, setCurrentCard] = useState("wallet");
     const labels = ["STR", "INT", "HLT", "WRK", "INC"];
 
     useEffect(() => {
@@ -68,6 +72,7 @@ function Dashboard() {
         return () => clearInterval(interval);
     }, []);
 
+    // Radar chart data fetch
     useEffect(() => {
         const qHabit = query(collection(db, "habitList"));
         const qFinance = query(collection(db, "finance"));
@@ -112,6 +117,84 @@ function Dashboard() {
         };
     }, []);
 
+    // Finance transaction data fetch
+    useEffect(() => {
+        const q = query(collection(db, 'finance'));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const transactionsData = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+
+            // Sort transactions by date (ascending)
+            transactionsData.sort((a, b) => a.date.seconds - b.date.seconds);
+
+            setTransactions(transactionsData);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    // Calculate savings and wallet balances
+    useEffect(() => {
+        const savingsTotal = transactions
+            .filter((transaction) => 
+                transaction.category === 'withdraw/savings' || 
+                transaction.category === 'deposit/savings'
+            )
+            .reduce((total, transaction) => {
+                return transaction.category === 'deposit/savings'
+                    ? total + transaction.amount
+                    : total - transaction.amount;
+            }, 0);
+    
+        setTotalSavings(savingsTotal);
+    
+        const totalIncome = transactions
+            .filter((transaction) => transaction.category === 'income')
+            .reduce((total, transaction) => total + transaction.amount, 0);
+    
+        const totalExpenses = transactions
+            .filter((transaction) => transaction.category === 'expenses')
+            .reduce((total, transaction) => total + transaction.amount, 0);
+    
+        const totalNone = transactions
+            .filter((transaction) => transaction.category === 'none')
+            .reduce((total, transaction) => total + transaction.amount, 0);
+    
+        setTotalWallet(totalIncome - totalExpenses + totalNone);
+    }, [transactions]);
+
+    const handleSwitch = () => {
+        setCurrentCard((prevCard) => (prevCard === 'wallet' ? 'savings' : 'wallet'));
+    };
+
+    const renderCardContent = () => {
+        if (currentCard === 'wallet') {
+            return (
+                <div className="balance-info">
+                    <h5>balance</h5>
+                    <h1>
+                        ₱<span className="amount">
+                            {new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(totalWallet)}
+                        </span>
+                    </h1>
+                </div>
+            );
+        } else {
+            return (
+                <div className="balance-info">
+                    <h5>balance</h5>
+                    <h1>
+                        ₱<span className="amount">
+                            {new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(totalSavings)}
+                        </span>
+                    </h1>
+                </div>
+            );
+        }
+    };
+
     const formatTwoDigits = (value) => value.toString().padStart(2, "0");
 
     const data = {
@@ -146,6 +229,8 @@ function Dashboard() {
             },
         },
     };
+
+    const totalNetWorth = totalWallet + totalSavings; // Calculate total net worth
 
     return (
         <div className="dashboard-container">
@@ -182,7 +267,7 @@ function Dashboard() {
             </div>
             <div className="board3">
                 <p>Net Worth</p>
-                <h1>₱98,000</h1>
+                <h1>₱{new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(totalNetWorth)}</h1>
             </div>
             <div className="board4"></div>
             <div className="board5">
