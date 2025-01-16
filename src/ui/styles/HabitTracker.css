@@ -10,14 +10,14 @@
     padding: 10px 20px;
 }
 
-.habit-list {
+.habit-tracker-list {
     margin-top: 10px;
     list-style-type: none;
     padding: 0;
     font-size: 0.9rem;
 }
 
-.habit-list .habit {
+.habit-tracker-list .habit {
     background-color: #222222;
     padding: 10px 20px;
     margin: 10px 0;

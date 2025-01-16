@@ -106,7 +106,7 @@ function HabitTracker() {
         <div className='habit-container'>
             <div className="habits">
                 <h2>Daily Habits</h2>
-                <div className="habit-list">
+                <div className="habit-tracker-list">
                     {habits.map((habit) => (
                         <Habit
                             key={habit.id}
