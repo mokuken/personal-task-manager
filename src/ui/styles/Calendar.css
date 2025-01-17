@@ -107,7 +107,7 @@ button:hover {
     height: 100%;
 }
 
-.habit-list li:last-child {
+.habit-list li:nth-last-child(2) {
     margin-bottom: 0;
 }
 
@@ -115,6 +115,7 @@ button:hover {
     display: flex;
     align-items: center;
     height: 100%;
+    margin-top: 5px;
 }
 
 .more-task li {
@@ -125,4 +126,8 @@ button:hover {
 .more-task .number {
     width: 20%;
     margin-left: 5px;
+}
+
+.hidden {
+    display: none;
 }

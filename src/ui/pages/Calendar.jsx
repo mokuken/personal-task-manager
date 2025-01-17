@@ -31,31 +31,34 @@ const Calendar = () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         const today = new Date();
-
+    
         const firstDay = new Date(year, month, 1).getDay();
         const totalDays = new Date(year, month + 1, 0).getDate();
-
+    
         const days = [];
-
+    
         // Add blank days for alignment
         for (let i = 0; i < firstDay; i++) {
             days.push(<div key={`empty-${i}`} className="empty"></div>);
         }
-
+    
         // Add the actual days
         for (let day = 1; day <= totalDays; day++) {
             const currentDay = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
-
+    
             // Filter habits for the current day
             const dailyHabits = habits.filter(habit =>
                 habit.achieveDates && habit.achieveDates.includes(currentDay)
             );
-
+    
             const visibleHabits = dailyHabits.slice(0, 3); // Show only the first 2 habits
             const lastHabit = dailyHabits[3] || { habitName: '' }; // Get the 3rd habit or empty object
             const remainingCount = dailyHabits.length - 4;
-
+    
+            // Determine if more-task should have the .hidden class
+            const moreTaskClass = `more-task ${!lastHabit.habitName && dailyHabits.length <= 3 ? 'hidden' : ''}`;
+    
             days.push(
                 <div key={day} className={`day ${isToday ? 'current-day' : ''}`}>
                     <strong>{day}</strong>
@@ -64,7 +67,7 @@ const Calendar = () => {
                             {visibleHabits.map((habit, index) => (
                                 <li key={index}>{habit.habitName}</li>
                             ))}
-                            <span className='more-task'>
+                            <span className={moreTaskClass}>
                                 <li>{lastHabit.habitName}</li>
                                 {dailyHabits.length > 4 && <li className="number">+{remainingCount}</li>}
                             </span>
@@ -73,7 +76,7 @@ const Calendar = () => {
                 </div>
             );
         }
-
+    
         return days;
     };
 
